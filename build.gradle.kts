@@ -4,7 +4,7 @@ plugins {
     id("com.palantir.git-version") version "3.0.0"
 }
 
-group = "io.github.abdol-ahmed.btp"
+group = "io.github.abdol_ahmed.btp"
 
 // Use git-version plugin for semantic versioning
 val gitVersion: groovy.lang.Closure<String> by extra
