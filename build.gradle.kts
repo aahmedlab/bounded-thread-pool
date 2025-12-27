@@ -60,8 +60,8 @@ publishing {
                 developers {
                     developer {
                         id.set("abdol-ahmed")
-                        name.set("Abdol Ahmed")
-                        email.set("your-email@example.com")
+                        name.set("Abdullah Ahmed")
+                        email.set("abdol.ahmed@gmail.com")
                     }
                 }
                 

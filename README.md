@@ -1,5 +1,10 @@
 # Bounded Thread Pool
 
+[![](https://jitpack.io/v/abdol-ahmed/bounded-thread-pool.svg)](https://jitpack.io/#abdol-ahmed/bounded-thread-pool)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![Java 17+](https://img.shields.io/badge/Java-17+-green.svg)](https://openjdk.org/)
+[![Tests](https://img.shields.io/badge/Tests-31%20Passing-brightgreen.svg)](https://github.com/abdol-ahmed/bounded-thread-pool/actions)
+
 A lightweight, thread-safe bounded thread pool implementation in Java with support for various rejection policies and graceful shutdown semantics.
 
 ## Features
@@ -16,7 +21,7 @@ A lightweight, thread-safe bounded thread pool implementation in Java with suppo
 ## Requirements
 
 - JDK 17+
-- Gradle 7.0+
+- Gradle 9.2.0+ (project uses Gradle 9.2.0)
 
 ## Quick Start - Test the Library
 
@@ -696,3 +701,14 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 4. Add tests for new functionality
 5. Ensure all tests pass
 6. Submit a pull request
+
+### Project Maintainer
+
+- **Abdullah Ahmed** (abdol-ahmed)
+- Email: abdol.ahmed@gmail.com
+
+### Build Requirements
+
+- **Gradle**: 9.2.0
+- **Java**: 17+
+- **Test Framework**: JUnit 5.10.0
