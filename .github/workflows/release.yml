@@ -8,6 +8,9 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
+    env:
+      MAVEN_USERNAME: ${{ secrets.CENTRAL_USERNAME }}
+      MAVEN_PASSWORD: ${{ secrets.CENTRAL_PASSWORD }}
     steps:
       - uses: actions/checkout@v4
       
@@ -17,8 +20,13 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
           server-id: central
-          server-username: ${{ secrets.CENTRAL_USERNAME }}
-          server-password: ${{ secrets.CENTRAL_PASSWORD }}
+          server-username: MAVEN_USERNAME
+          server-password: MAVEN_PASSWORD
+
+      - name: Debug Maven settings.xml (sanitized)
+        run: |
+          test -f ~/.m2/settings.xml || (echo "~/.m2/settings.xml not found" && exit 1)
+          sed -E 's#(<username>).*?(</username>)#\1***\2#g; s#(<password>).*?(</password>)#\1***\2#g' ~/.m2/settings.xml
           
       - name: Cache Maven packages
         uses: actions/cache@v3
@@ -30,7 +38,7 @@ jobs:
         uses: crazy-max/ghaction-import-gpg@v6
         with:
           gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
-          gpg_passphrase: ${{ secrets.GPG_PASSPHRASE }}
+          passphrase: ${{ secrets.GPG_PASSPHRASE }}
           git_user_signingkey: true
           git_commit_gpgsign: true
           
@@ -39,6 +47,3 @@ jobs:
         
       - name: Build and deploy
         run: mvn deploy -Dgpg.passphrase=${{ secrets.GPG_PASSPHRASE }}
-        env:
-          MAVEN_USERNAME: ${{ secrets.CENTRAL_USERNAME }}
-          MAVEN_PASSWORD: ${{ secrets.CENTRAL_PASSWORD }}
