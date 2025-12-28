@@ -8,6 +8,7 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
+    environment: release
     env:
       MAVEN_USERNAME: ${{ secrets.CENTRAL_USERNAME }}
       MAVEN_PASSWORD: ${{ secrets.CENTRAL_PASSWORD }}
@@ -39,3 +40,8 @@ jobs:
         
       - name: Build and deploy
         run: mvn -B -ntp -Prelease clean deploy -Dgpg.passphrase=${{ secrets.GPG_PASSPHRASE }}
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
