@@ -7,9 +7,8 @@ name: Qodana
 on:
   workflow_dispatch:
   pull_request:
-  push:
-    branches:
-      - main
+  schedule:
+    - cron: '0 2 * * *'
 
 jobs:
   qodana:
@@ -21,7 +20,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.head.sha }}
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           fetch-depth: 0
       - name: 'Qodana Scan'
         uses: JetBrains/qodana-action@v2025.3
