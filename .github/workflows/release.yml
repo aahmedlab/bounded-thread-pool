@@ -4,6 +4,8 @@ on:
   push:
     tags:
       - 'v*'
+permissions:
+  contents: write
 
 jobs:
   release:
@@ -12,6 +14,7 @@ jobs:
     env:
       MAVEN_USERNAME: ${{ secrets.CENTRAL_USERNAME }}
       MAVEN_PASSWORD: ${{ secrets.CENTRAL_PASSWORD }}
+      MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
     steps:
       - uses: actions/checkout@v4
       
@@ -39,7 +42,7 @@ jobs:
           mvn -B -ntp versions:commit
         
       - name: Build and deploy
-        run: mvn -B -ntp -Prelease clean deploy -Dgpg.passphrase=${{ secrets.GPG_PASSPHRASE }}
+        run: mvn -B -ntp -Prelease clean deploy
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
