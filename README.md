@@ -27,9 +27,10 @@ A lightweight, thread-safe bounded executor implementation in Java with support 
 ## Requirements
 
 - JDK 17+
-- Maven 3.6.0+ (project uses Maven 3.9.x)
+- Maven 3.8.6+ (enforced by Maven Enforcer)
 
 Note: CI runs tooling on JDK 21 for formatter/static-analysis compatibility while compiling bytecode with `--release 17`.
+Note: This project enforces a JDK range via Maven Enforcer; see `pom.xml` for the current allowed range.
 
 ## Installation
 
@@ -42,7 +43,7 @@ Add the following dependency to your project:
 <dependency>
     <groupId>dev.aahmedlab</groupId>
     <artifactId>bounded-executor</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.4</version>
 </dependency>
 ```
 
@@ -189,6 +190,35 @@ mvn package
 
 # Install to local repository
 mvn install
+```
+
+### Troubleshooting build tool failures
+
+```bash
+# Re-run with full stack traces
+mvn -B -ntp -e clean verify
+
+# Re-run with Maven debug logging
+mvn -B -ntp -X clean verify
+```
+
+If you need to temporarily bypass static analysis while debugging:
+
+```bash
+# Skip SpotBugs
+mvn -B -ntp -Dspotbugs.skip=true clean verify
+
+# Skip Spotless check
+mvn -B -ntp -Dspotless.check.skip=true clean verify
+```
+
+### Local release-profile build (signing)
+
+The `release` profile enables GPG signing via `maven-gpg-plugin`.
+
+```bash
+# Build and run release-profile checks (will attempt to sign during verify)
+mvn -B -ntp -Prelease -DskipTests verify
 ```
 
 ## Architecture
@@ -342,8 +372,38 @@ git tag v1.0.2
 git push origin v1.0.2
 ```
 
+#### Maven Central publishing prerequisites
+
+- **Namespace approval**: Maven Central must allow publishing for the `groupId` (`dev.aahmedlab`). If the namespace is not claimed/verified in the Sonatype Central Portal, publishing will fail with a message like `Namespace 'dev.aahmedlab' is not allowed`.
+- **GPG signing**: Maven Central requires `.asc` signatures for the main jar, sources jar, javadoc jar, and pom.
+- **Credentials/secrets**: The release workflow expects secrets in the GitHub Environment named `release`:
+  - `CENTRAL_USERNAME`
+  - `CENTRAL_PASSWORD`
+  - `GPG_PRIVATE_KEY`
+  - `GPG_PASSPHRASE`
+
+#### Publishing a new version
+
+After the tag is pushed, the GitHub Actions release workflow sets the Maven project version from the git tag:
+
+```bash
+mvn -B -ntp versions:set -DnewVersion=${GITHUB_REF#refs/tags/v} -DgenerateBackupPoms=false
+mvn -B -ntp versions:commit
+```
+
+```bash
+# Ensure main is up to date
+git checkout main
+git pull
+
+# Create and push the tag that matches the intended version
+git tag v1.0.4
+git push origin v1.0.4
+```
+
 The release workflow:
 
+- Sets the project version from the tag
 - Builds with `-Prelease`
 - Signs artifacts (GPG)
 - Publishes to Maven Central
@@ -358,7 +418,7 @@ Release secrets are expected to be stored in the GitHub Environment named `relea
 
 ### Build Requirements
 
-- **Maven**: 3.6.0+
+- **Maven**: 3.8.6+
 - **Java**: 17+
 - **Test Framework**: JUnit 5.10.0
 
