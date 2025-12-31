@@ -30,8 +30,26 @@ jobs:
           
       - name: Import GPG key
         run: |
-          echo "${{ secrets.GPG_PRIVATE_KEY }}" | gpg --batch --import --no-tty --passphrase "${{ secrets.GPG_PASSPHRASE }}"
-          gpg --list-secret-keys --keyid-format LONG
+          echo "Checking if GPG secrets are available..."
+          if [ -z "${{ secrets.GPG_PRIVATE_KEY }}" ]; then
+            echo "ERROR: GPG_PRIVATE_KEY secret is not set"
+            exit 1
+          fi
+          if [ -z "${{ secrets.GPG_PASSPHRASE }}" ]; then
+            echo "ERROR: GPG_PASSPHRASE secret is not set"
+            exit 1
+          fi
+          
+          echo "Importing GPG private key..."
+          echo "${{ secrets.GPG_PRIVATE_KEY }}" | gpg --batch --import --no-tty --passphrase "${{ secrets.GPG_PASSPHRASE }}" || echo "Import attempt completed"
+          
+          echo "Listing imported keys..."
+          gpg --list-secret-keys --keyid-format LONG || echo "No secret keys found"
+          
+          echo "Configuring GPG agent..."
+          mkdir -p ~/.gnupg
+          echo "allow-loopback-pinentry" >> ~/.gnupg/gpg-agent.conf
+          gpg-connect-agent reloadagent /bye || echo "Agent reload completed"
           
       - name: Set version from tag
         run: |
@@ -40,8 +58,10 @@ jobs:
         
       - name: Build and deploy
         run: |
-          mvn -B -ntp -Prelease clean deploy \
-            -Dgpg.pinentry-mode=loopback
+          echo "Starting Maven build with debug logging..."
+          mvn -B -ntp -Prelease clean deploy -X \
+            -Dgpg.pinentry-mode=loopback \
+            -Dgpg.executable=gpg
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
