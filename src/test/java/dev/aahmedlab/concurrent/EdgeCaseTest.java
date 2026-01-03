@@ -179,9 +179,7 @@ class EdgeCaseTest {
   void submitNullTask() {
     pool = new BoundedExecutor(1, 10, RejectionPolicy.ABORT);
 
-    assertThrows(
-        NullPointerException.class,
-        () -> pool.submit((Runnable) null));
+    assertThrows(NullPointerException.class, () -> pool.submit((Runnable) null));
   }
 
   @Test
@@ -192,10 +190,11 @@ class EdgeCaseTest {
 
     assertThrows(
         RejectedExecutionException.class,
-        () -> pool.submit(
-            () -> {
-              // Should not execute
-            }));
+        () ->
+            pool.submit(
+                () -> {
+                  // Should not execute
+                }));
   }
 
   @Test
@@ -207,11 +206,10 @@ class EdgeCaseTest {
     assertThrows(
         RejectedExecutionException.class,
         () ->
-          pool.submit(
-              () -> {
-                // Should not execute
-              })
-        );
+            pool.submit(
+                () -> {
+                  // Should not execute
+                }));
   }
 
   @Test
@@ -277,15 +275,13 @@ class EdgeCaseTest {
 
     // Fill the queue with a second task
     CountDownLatch secondTaskSubmitted = new CountDownLatch(1);
-    pool.submit(
-            secondTaskSubmitted::countDown);
+    pool.submit(secondTaskSubmitted::countDown);
 
     // Next task should run in caller thread (3rd task)
     Thread callerThread = Thread.currentThread();
     AtomicInteger taskThread = new AtomicInteger();
 
-    pool.submit(
-        () -> taskThread.set(Thread.currentThread().hashCode()));
+    pool.submit(() -> taskThread.set(Thread.currentThread().hashCode()));
 
     assertEquals(callerThread.hashCode(), taskThread.get());
 

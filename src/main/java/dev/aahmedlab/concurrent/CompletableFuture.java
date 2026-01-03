@@ -33,7 +33,25 @@ public class CompletableFuture<T> implements Future<T> {
   @Override
   public T get(long timeout, TimeUnit unit)
       throws InterruptedException, ExecutionException, TimeoutException {
-    return null;
+    lock.lock();
+    try {
+      long deadlineNanos = System.nanoTime() + unit.toNanos(timeout);
+      while (!completed) {
+        long remainingNanos = deadlineNanos - System.nanoTime();
+        if (remainingNanos <= 0) {
+          throw new TimeoutException();
+        }
+        if (!done.await(remainingNanos, TimeUnit.NANOSECONDS)) {
+          throw new TimeoutException();
+        }
+      }
+      if (exception != null) {
+        throw new ExecutionException(exception);
+      }
+      return result;
+    } finally {
+      lock.unlock();
+    }
   }
 
   @Override
