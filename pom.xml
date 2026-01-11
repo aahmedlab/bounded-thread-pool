@@ -12,7 +12,7 @@
     <packaging>jar</packaging>
     
     <name>Bounded Executor</name>
-    <description>A bounded executor implementation with bounded queue and configurable rejection policies</description>
+    <description>A bounded executor implementation with a bounded queue and configurable rejection policies</description>
     <url>https://github.com/aahmedlab/bounded-executor</url>
     
     <properties>
@@ -23,8 +23,8 @@
         
         <!-- Dependency versions -->
         <slf4j.version>2.0.9</slf4j.version>
-        <logback.version>1.5.23</logback.version>
-        <junit.version>5.10.0</junit.version>
+        <logback.version>1.5.24</logback.version>
+        <junit.version>6.0.2</junit.version>
     </properties>
     
     <dependencyManagement>
@@ -125,6 +125,12 @@
                 <groupId>com.github.spotbugs</groupId>
                 <artifactId>spotbugs-maven-plugin</artifactId>
                 <version>4.9.8.2</version>
+                <configuration>
+                    <effort>Max</effort>
+                    <threshold>Low</threshold>
+                    <!-- optional but common -->
+                    <xmlOutput>true</xmlOutput>
+                </configuration>
                 <executions>
                     <execution>
                         <id>spotbugs-check</id>
@@ -133,9 +139,8 @@
                             <goal>check</goal>
                         </goals>
                         <configuration>
-                            <effort>Max</effort>
-                            <threshold>Low</threshold>
                             <failOnError>true</failOnError>
+                            <failThreshold>Low</failThreshold>
                         </configuration>
                     </execution>
                 </executions>
@@ -196,7 +201,7 @@
             <plugin>
                 <groupId>org.sonatype.central</groupId>
                 <artifactId>central-publishing-maven-plugin</artifactId>
-                <version>0.9.0</version>
+                <version>0.10.0</version>
                 <extensions>true</extensions>
                 <configuration>
                     <publishingServerId>central</publishingServerId>
